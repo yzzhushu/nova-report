@@ -17,7 +17,7 @@ class Report extends Tool
     public function boot()
     {
         Nova::script('report', __DIR__.'/../dist/js/tool.js');
-        Nova::style('report', __DIR__.'/../dist/css/tool.css');
+//        Nova::style('report', __DIR__.'/../dist/css/tool.css');
     }
 
     /**
@@ -28,8 +28,6 @@ class Report extends Tool
      */
     public function menu(Request $request)
     {
-        return MenuSection::make('Report')
-            ->path('/report')
-            ->icon('server');
+        return null;
     }
 }

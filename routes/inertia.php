@@ -14,6 +14,6 @@ use Laravel\Nova\Http\Requests\NovaRequest;
 |
 */
 
-Route::get('/', function (NovaRequest $request) {
-    return inertia('Report');
+Route::get('/{reportId}', function (NovaRequest $request, $reportId) {
+    return inertia('Report', ['reportId' => $reportId]);
 });
