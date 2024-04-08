@@ -1,0 +1,197 @@
+<?php
+
+namespace Jshxl\Report\Nova;
+
+use Ramsey\Uuid\Uuid;
+use App\Nova\Resource;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
+use Laravel\Nova\Fields\Boolean;
+use Laravel\Nova\Fields\DateTime;
+use Laravel\Nova\Fields\Repeater;
+use Laravel\Nova\Fields\Text;
+use Laravel\Nova\Fields\Textarea;
+use Laravel\Nova\Http\Requests\NovaRequest;
+use Jshxl\Report\Nova\Repeater\ReportField;
+
+class JshxlReport extends Resource
+{
+    /**
+     * The model the resource corresponds to.
+     *
+     * @var class-string<\Jshxl\Report\Models\JshxlReport>
+     */
+    public static string $model = \Jshxl\Report\Models\JshxlReport::class;
+
+    /**
+     * The single value that should be used to represent the resource when being displayed.
+     *
+     * @var string
+     */
+    public static $title = 'name';
+
+    /**
+     * The columns that should be searched.
+     *
+     * @var array
+     */
+    public static $search = ['uuid', 'name', 'group_name'];
+
+    /**
+     * Indicates if the resource should be globally searchable.
+     *
+     * @var bool
+     */
+    public static $globallySearchable = false;
+
+    /**
+     * Get the displayable label of the resource.
+     *
+     * @return string
+     */
+    public static function label(): string
+    {
+        return __('Jshxl Report');
+    }
+
+    /**
+     * Get the fields displayed by the resource.
+     *
+     * @param NovaRequest $request
+     * @return array
+     */
+    public function fields(NovaRequest $request): array
+    {
+        return [
+            Text::make(__('Report Group'), 'group_name')
+                ->help('分组名称，用于报表归类展示，建议4个字，例如：销售报表')
+                ->rules('nullable', 'string', 'max:16')
+                ->suggestions($request->isFormRequest() ? DB::table('jshxl_report')
+                    ->select('group_name')->distinct()->pluck('group_name')->toArray() : [])
+                ->textAlign('center'),
+            Text::make(__('Report UUID'), 'uuid')
+                ->exceptOnForms()
+                ->displayUsing(function ($uuid) use ($request) {
+                    if ($request->isResourceDetailRequest()) return $uuid;
+                    return substr($uuid, 0, 4) . '...' . substr($uuid, -4);
+                })
+                ->textAlign('center'),
+            Text::make(__('Report Name'), 'name')
+                ->help('报表名称，建议6个字以内，例如：残次品销售')
+                ->rules('required', 'max:24')
+                ->textAlign('center'),
+            Text::make(__('Display Sorting'), 'sort_no')
+                ->default(10000)
+                ->hideFromIndex()
+                ->withMeta(['type' => 'number', 'step' => 1, 'min' => 1, 'max' => 99999])
+                ->help('报表展示顺序，数字越大越靠前，最小为1，最大为99999')
+                ->rules('required', 'integer', 'min:1', 'max:99999'),
+
+            $request->isResourceIndexRequest() ?
+                Text::make(__('Report SQL'), 'sql')
+                    ->textAlign('center')
+                    ->displayUsing(function ($sql) {
+                        return strlen($sql) . ' 个字符';
+                    }) :
+                Textarea::make(__('Report SQL'), 'sql')
+                    ->help('报表SQL语句，支持变量替换，详情见报表撰写手册')
+                    ->rows(24)
+                    ->alwaysShow(),
+
+            $request->isFormRequest() ?
+                Repeater::make(__('Report Fields'), 'fields')
+                    ->repeatables([
+                        ReportField::make(),
+                    ]) :
+                Text::make(__('Report Fields'), 'fields')
+                    ->displayUsing(function ($fields) use ($request) {
+                        if ($request->isResourceIndexRequest())
+                            return count($fields) . ' 个字段';
+                        return count($fields) === 0 ? '' : $this->drawTable($fields);
+                    })
+                    ->asHtml()
+                    ->textAlign('center'),
+
+            Boolean::make(__('Report Status'), 'status')
+                ->help('报表启用状态，默认停用，即：所有人均无法查看该报表')
+                ->default(0),
+
+            DateTime::make(__('Created At'), 'created_at')
+                ->onlyOnDetail()
+                ->displayUsing(function ($created_at) {
+                    return $created_at->format('Y-m-d H:i:s');
+                }),
+            DateTime::make(__('Updated At'), 'updated_at')
+                ->textAlign('center')
+                ->displayUsing(function ($updated_at) {
+                    return $updated_at->format('Y-m-d H:i:s');
+                })
+                ->exceptOnForms(),
+        ];
+    }
+
+    /**
+     * Build an "index" query for the given resource.
+     *
+     * @param NovaRequest $request
+     * @param  Builder  $query
+     * @return Builder
+     */
+    public static function indexQuery(NovaRequest $request, $query): Builder
+    {
+        $query->getQuery()->orders = [];
+        return $query->orderByDesc('sort_no')->orderBy('id');
+    }
+
+    /**
+     * 创建完成后，生成唯一ID标识
+     * @param NovaRequest $request
+     * @param Model $model
+     *
+     * @return void
+     * */
+    public static function afterCreate(NovaRequest $request, Model $model): void
+    {
+        $model->uuid = Uuid::uuid4()->toString();
+        $model->save();
+    }
+
+    /**
+     * 绘制字段表格
+     * @param array $fields
+     *
+     * @return string
+     * */
+    protected function drawTable(array $fields): string
+    {
+        $class = 'px-6 py-2 text-gray-500 dark:bg-gray-800 border';
+        $rows = join('', array_map(function ($field) use ($class) {
+            $html  = '<tr>';
+            $html .= "<td class='{$class}'>" . $field['fields']['code'] . '</td>';
+            $html .= "<td class='{$class}'>" . $field['fields']['name'] . '</td>';
+            $html .= "<td class='{$class}'>" . ($field['fields']['sort'] ? '是' : '否') . '</td>';
+            $html .= '</tr>';
+            return $html;
+        }, $fields));
+
+        $field1 = __('Field Code');
+        $field2 = __('Field Name');
+        $field3 = __('Sorted Field');
+
+        return <<<html
+<table class="table table-hover text-center border">
+    <thead class="bg-gray-50 dark:bg-gray-800">
+        <tr>
+            <th class='{$class}'>{$field1}</th>
+            <th class='{$class}'>{$field2}</th>
+            <th class='{$class}'>{$field3}</th>
+        </tr>
+    </thead>
+    <tbody class="divide-y divide-gray-100 dark:divide-gray-700">
+        $rows
+    </tbody>
+</table>
+html;
+    }
+}

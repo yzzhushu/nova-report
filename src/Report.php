@@ -2,10 +2,9 @@
 
 namespace Jshxl\Report;
 
-use Illuminate\Http\Request;
-use Laravel\Nova\Menu\MenuSection;
 use Laravel\Nova\Nova;
 use Laravel\Nova\Tool;
+use Illuminate\Http\Request;
 
 class Report extends Tool
 {
@@ -14,19 +13,18 @@ class Report extends Tool
      *
      * @return void
      */
-    public function boot()
+    public function boot(): void
     {
-        Nova::script('report', __DIR__.'/../dist/js/tool.js');
-//        Nova::style('report', __DIR__.'/../dist/css/tool.css');
+        Nova::script('report', __DIR__ . '/../dist/js/tool.js');
     }
 
     /**
      * Build the menu that renders the navigation links for the tool.
      *
-     * @param  \Illuminate\Http\Request $request
-     * @return mixed
+     * @param Request $request
+     * @return null
      */
-    public function menu(Request $request)
+    public function menu(Request $request): mixed
     {
         return null;
     }
