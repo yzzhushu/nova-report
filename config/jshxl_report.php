@@ -1,9 +1,10 @@
 <?php
 
 return [
-    /**
-     * 所使用的用户模型
-     *
-     * */
-    'userModel' => App\Models\User::class,
+
+    // 用户列表接口PATH
+    'api_user_list' => '/nova-vendor/report/auth/user/lists',
+
+    // 用户列表接口请求方式
+    'api_user_list_method' => 'POST',
 ];

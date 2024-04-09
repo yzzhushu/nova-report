@@ -6,11 +6,11 @@
     "Fields Mapping": "字段映射",
     "Field Code": "字段编码",
     "Field Name": "字段名称",
-    "Sorted Field": "排序字段",
     "Report SQL": "查询语句",
     "Report Group": "报表分组",
     "Display Sorting": "展示排序",
     "Created At": "创建时间",
     "Updated At": "更新时间",
-    "Report UUID": "报表标识"
+    "Report UUID": "报表标识",
+    "Report Users": "报表用户"
 }

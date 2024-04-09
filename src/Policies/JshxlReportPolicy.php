@@ -2,36 +2,34 @@
 
 namespace Jshxl\Report\Policies;
 
-use App\Models\User;
-
 class JshxlReportPolicy
 {
-    public function viewAny(User $user): bool
+    public function viewAny(): bool
     {
         return true;
     }
 
-    public function view(User $user): bool
+    public function view(): bool
     {
         return true;
     }
 
-    public function create(User $user): bool
+    public function create(): bool
     {
         return true;
     }
 
-    public function update(User $user): bool
+    public function update(): bool
     {
         return true;
     }
 
-    public function replicate(User $user): bool
+    public function replicate(): bool
     {
         return false;
     }
 
-    public function delete(User $user): bool
+    public function delete(): bool
     {
         return false;
     }

@@ -20,7 +20,8 @@ return new class extends Migration
             $table->integer('sort_no')->default(1);                         // 报表排序
             $table->text('sql')->nullable();
 
-            $table->text('fields')->default('[]');                          // 报表字段
+            $table->text('fields')->default('{}');                          // 报表字段
+            $table->text('users')->default('[]');                           // 授权用户
 
             $table->smallInteger('status')->default(1);                     // 报表状态：0、停用；1、启用
 

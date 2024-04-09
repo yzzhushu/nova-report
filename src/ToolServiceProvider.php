@@ -61,6 +61,7 @@ class ToolServiceProvider extends ServiceProvider
 
         Route::middleware(['nova', Authorize::class])
             ->prefix('nova-vendor/report')
+            ->namespace('Jshxl\Report\Http\Controllers')
             ->group(__DIR__.'/../routes/api.php');
     }
 

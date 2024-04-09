@@ -4,6 +4,7 @@ namespace Jshxl\Report\Http\Middleware;
 
 use Laravel\Nova\Nova;
 use Jshxl\Report\Report;
+use Laravel\Nova\Tool;
 
 class Authorize
 {
@@ -24,10 +25,10 @@ class Authorize
     /**
      * Determine whether this tool belongs to the package.
      *
-     * @param  \Laravel\Nova\Tool  $tool
+     * @param  Tool  $tool
      * @return bool
      */
-    public function matchesTool($tool)
+    public function matchesTool(Tool $tool): bool
     {
         return $tool instanceof Report;
     }

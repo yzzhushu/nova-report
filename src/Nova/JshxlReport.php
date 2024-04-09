@@ -2,18 +2,16 @@
 
 namespace Jshxl\Report\Nova;
 
-use Ramsey\Uuid\Uuid;
+use Jshxl\ListBox\ListBox;
 use App\Nova\Resource;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 use Laravel\Nova\Fields\Boolean;
 use Laravel\Nova\Fields\DateTime;
-use Laravel\Nova\Fields\Repeater;
+use Laravel\Nova\Fields\KeyValue;
 use Laravel\Nova\Fields\Text;
 use Laravel\Nova\Fields\Textarea;
 use Laravel\Nova\Http\Requests\NovaRequest;
-use Jshxl\Report\Nova\Repeater\ReportField;
 
 class JshxlReport extends Resource
 {
@@ -92,27 +90,26 @@ class JshxlReport extends Resource
                 Text::make(__('Report SQL'), 'sql')
                     ->textAlign('center')
                     ->displayUsing(function ($sql) {
-                        return strlen($sql) . ' 个字符';
+                        return substr($sql, 0, 24) . '...';
                     }) :
                 Textarea::make(__('Report SQL'), 'sql')
                     ->help('报表SQL语句，支持变量替换，详情见报表撰写手册')
+                    ->rules('required', 'string', 'min:1')
                     ->rows(24)
                     ->alwaysShow(),
 
-            $request->isFormRequest() ?
-                Repeater::make(__('Report Fields'), 'fields')
-                    ->repeatables([
-                        ReportField::make(),
-                    ]) :
-                Text::make(__('Report Fields'), 'fields')
-                    ->displayUsing(function ($fields) use ($request) {
-                        if ($request->isResourceIndexRequest())
-                            return count($fields) . ' 个字段';
-                        return count($fields) === 0 ? '' : $this->drawTable($fields);
-                    })
-                    ->asHtml()
-                    ->textAlign('center'),
-
+            KeyValue::make(__('Report Fields'), 'fields')
+                ->keyLabel(__('Field Code'))
+                ->valueLabel(__('Field Name')),
+            ListBox::make(__('Report Users'), 'users')
+                ->options(config('jshxl_report.api_user_list'))
+                ->method(config('jshxl_report.api_user_list_method'))
+                ->displayTable()
+                ->formatInt()
+                ->displayUsing(function ($users) {
+                    return count($users) . ' 位用户';
+                })
+                ->textAlign('center'),
             Boolean::make(__('Report Status'), 'status')
                 ->help('报表启用状态，默认停用，即：所有人均无法查看该报表')
                 ->default(0),
@@ -133,65 +130,14 @@ class JshxlReport extends Resource
 
     /**
      * Build an "index" query for the given resource.
-     *
      * @param NovaRequest $request
-     * @param  Builder  $query
+     * @param Builder $query
+     *
      * @return Builder
      */
     public static function indexQuery(NovaRequest $request, $query): Builder
     {
         $query->getQuery()->orders = [];
         return $query->orderByDesc('sort_no')->orderBy('id');
-    }
-
-    /**
-     * 创建完成后，生成唯一ID标识
-     * @param NovaRequest $request
-     * @param Model $model
-     *
-     * @return void
-     * */
-    public static function afterCreate(NovaRequest $request, Model $model): void
-    {
-        $model->uuid = Uuid::uuid4()->toString();
-        $model->save();
-    }
-
-    /**
-     * 绘制字段表格
-     * @param array $fields
-     *
-     * @return string
-     * */
-    protected function drawTable(array $fields): string
-    {
-        $class = 'px-6 py-2 text-gray-500 dark:bg-gray-800 border';
-        $rows = join('', array_map(function ($field) use ($class) {
-            $html  = '<tr>';
-            $html .= "<td class='{$class}'>" . $field['fields']['code'] . '</td>';
-            $html .= "<td class='{$class}'>" . $field['fields']['name'] . '</td>';
-            $html .= "<td class='{$class}'>" . ($field['fields']['sort'] ? '是' : '否') . '</td>';
-            $html .= '</tr>';
-            return $html;
-        }, $fields));
-
-        $field1 = __('Field Code');
-        $field2 = __('Field Name');
-        $field3 = __('Sorted Field');
-
-        return <<<html
-<table class="table table-hover text-center border">
-    <thead class="bg-gray-50 dark:bg-gray-800">
-        <tr>
-            <th class='{$class}'>{$field1}</th>
-            <th class='{$class}'>{$field2}</th>
-            <th class='{$class}'>{$field3}</th>
-        </tr>
-    </thead>
-    <tbody class="divide-y divide-gray-100 dark:divide-gray-700">
-        $rows
-    </tbody>
-</table>
-html;
     }
 }
