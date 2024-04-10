@@ -26,6 +26,7 @@ class Report extends Tool
      */
     public function menu(Request $request): mixed
     {
-        return null;
+        if (!is_null(Nova::$mainMenuCallback)) return null;
+        return ReportMenu::make($request);
     }
 }
