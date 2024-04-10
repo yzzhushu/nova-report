@@ -72,7 +72,7 @@ class JshxlReport extends Resource
                 ->exceptOnForms()
                 ->displayUsing(function ($uuid) use ($request) {
                     if ($request->isResourceDetailRequest()) return $uuid;
-                    return substr($uuid, 0, 4) . '...' . substr($uuid, -4);
+                    return $this->sort_no . '...' . substr($uuid, -4);
                 })
                 ->textAlign('center'),
             Text::make(__('Report Name'), 'name')
