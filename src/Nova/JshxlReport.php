@@ -90,7 +90,7 @@ class JshxlReport extends Resource
                 Text::make(__('Report SQL'), 'sql')
                     ->textAlign('center')
                     ->displayUsing(function ($sql) {
-                        return substr($sql, 0, 24) . '...';
+                        return mb_substr($sql, 0, 24) . '...';
                     }) :
                 Textarea::make(__('Report SQL'), 'sql')
                     ->help('报表SQL语句，支持变量替换，详情见报表撰写手册')

@@ -5,6 +5,7 @@ namespace Jshxl\Report;
 use Laravel\Nova\Nova;
 use Laravel\Nova\Tool;
 use Illuminate\Http\Request;
+use Laravel\Nova\Exceptions\NovaException;
 
 class Report extends Tool
 {
@@ -22,7 +23,10 @@ class Report extends Tool
      * Build the menu that renders the navigation links for the tool.
      *
      * @param Request $request
-     * @return null
+     *
+     * @return null|array
+     *
+     * @throws NovaException
      */
     public function menu(Request $request): mixed
     {

@@ -35,6 +35,8 @@ class ToolServiceProvider extends ServiceProvider
         $this->loadJsonTranslationsFrom(file_exists(lang_path('vendor/report')) ?
             lang_path('vendor/report') : __DIR__ . '/../resources/lang');
 
+
+
         // 如果publish了配置文件，则加载publish的配置文件，否则加载默认的配置文件
         $this->mergeConfigFrom(file_exists(config_path('jshxl_report.php')) ?
             config_path('jshxl_report.php') : __DIR__ . '/../config/jshxl_report.php', 'jshxl_report');

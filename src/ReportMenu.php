@@ -4,6 +4,7 @@ namespace Jshxl\Report;
 
 use Illuminate\Http\Request;
 use Jshxl\Report\Models\JshxlReport;
+use Laravel\Nova\Exceptions\NovaException;
 use Laravel\Nova\Menu\MenuGroup;
 use Laravel\Nova\Menu\MenuItem;
 use Laravel\Nova\Menu\MenuSection;
@@ -15,7 +16,9 @@ class ReportMenu
      * @param Request $request
      *
      * @return array
-     * */
+     *
+     * @throws NovaException
+     */
     public static function make(Request $request): array
     {
         if (is_null($request->user()) ||
@@ -45,8 +48,7 @@ class ReportMenu
 
         return count($lists) > 0 ? [
             MenuSection::make(__('Jshxl Report'), $lists)
-                ->icon('presentation-chart-bar')
-                ->collapsable(),
+                ->icon('presentation-chart-bar')->collapsable(),
         ] : [];
     }
 }

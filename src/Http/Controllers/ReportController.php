@@ -8,9 +8,25 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Inertia\Response;
 use Inertia\ResponseFactory;
+use Jshxl\Report\Models\JshxlReport;
 
 class ReportController
 {
+    /**
+     * 支持的字段结构
+     *
+     * @var array
+     * */
+    protected array $structure = [
+        '{start_date}' => '开始日期',
+        '{final_date}' => '结束日期',
+        '{start_time}' => '开始时间',
+        '{final_time}' => '结束时间',
+        '{department}' => '业务门店',
+        '{categories}' => '商品分类',
+        '{products}'   => '商品编码',
+    ];
+
     /**
      * Report tool index page.
      * @param Request $request
@@ -49,5 +65,35 @@ class ReportController
                 ];
             })->toArray();
         return \response()->json(['resources' => $users]);
+    }
+
+    /**
+     * 获取报表结构
+     * @param Request $request
+     *
+     * @return JsonResponse
+     * */
+    public function getStructure(Request $request): JsonResponse
+    {
+        $report = JshxlReport::where('uuid', $request->input('reportId'))->first();
+        if (is_null($report)) return \response()->json(['error' => '报表不存在']);
+        if ($report->status !== 1) return \response()->json(['error' => '该报表还未启用']);
+
+        $struct = [];
+        foreach ($this->structure as $key => $val) {
+            if (!str_contains($report->sql, $key)) continue;
+            $struct[] = [
+                'key'   => $key,
+                'value' => $val,
+            ];
+        }
+        return \response()->json([
+            'name' => $report->name,
+            'fields' => [
+                ['field' => 'id', 'header' => '编码'],
+                ['field' => 'name', 'header' => '姓名'],
+            ],
+            'structures' => $struct,
+        ]);
     }
 }
