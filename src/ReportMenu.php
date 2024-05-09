@@ -25,10 +25,10 @@ class ReportMenu
             !isset($request->user()->id)) return [];
 
         $reports = JshxlReport::query()
-            ->whereJsonContains('users', $request->user()->id)
+            ->whereJsonContains('auth_users', $request->user()->id)
             ->where('status', 1)
-            ->select('uuid', 'name', 'group_name')
-            ->orderByDesc('sort_no')->orderBy('id')
+            ->select('uuid', 'report_name', 'group_name')
+            ->orderByDesc('display_sort')->orderBy('id')
             ->get();
         if ($reports->count() === 0) return [];
 
@@ -42,7 +42,7 @@ class ReportMenu
                 $group = [];
                 $_name = $report->group_name;
             }
-            $group[] = MenuItem::link($report->name, 'report/' . $report->uuid);
+            $group[] = MenuItem::link($report->report_name, 'jshxl-report/' . $report->uuid);
         }
         if (count($group) > 0) $lists[] = MenuGroup::make($_name, $group)->collapsable();
 
