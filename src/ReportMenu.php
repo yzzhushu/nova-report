@@ -21,8 +21,7 @@ class ReportMenu
      */
     public static function make(Request $request): array
     {
-        if (is_null($request->user()) ||
-            !isset($request->user()->id)) return [];
+        if (is_null($request->user()) || !isset($request->user()->id)) return [];
 
         $reports = JshxlReport::query()
             ->whereJsonContains('auth_users', $request->user()->id)
