@@ -32,14 +32,18 @@ class ToolServiceProvider extends ServiceProvider
         Nova::resources([JshxlReport::class]);
 
         // 如果publish了语言文件，则加载publish的语言文件，否则加载默认的语言文件
-        $this->loadJsonTranslationsFrom(file_exists(lang_path('vendor/report')) ?
-            lang_path('vendor/report') : __DIR__ . '/../resources/lang');
-
-
+        $this->loadJsonTranslationsFrom(
+            file_exists(lang_path('vendor/report')) ?
+                lang_path('vendor/report') :
+                __DIR__ . '/../lang'
+        );
 
         // 如果publish了配置文件，则加载publish的配置文件，否则加载默认的配置文件
-        $this->mergeConfigFrom(file_exists(config_path('jshxl_report.php')) ?
-            config_path('jshxl_report.php') : __DIR__ . '/../config/jshxl_report.php', 'jshxl_report');
+        $this->mergeConfigFrom(
+            file_exists(config_path('jshxl_report.php')) ?
+                config_path('jshxl_report.php') :
+                __DIR__ . '/../config/jshxl_report.php',
+        'jshxl_report');
 
         Nova::serving(function (ServingNova $event) {
             //
@@ -57,14 +61,15 @@ class ToolServiceProvider extends ServiceProvider
             return;
         }
 
-        Nova::router(['nova', Authenticate::class, Authorize::class], 'report')
+        Route::middleware(['nova', Authenticate::class, Authorize::class])
+            ->prefix('jshxl-report')
             ->namespace('Jshxl\Report\Http\Controllers')
-            ->group(__DIR__.'/../routes/inertia.php');
+            ->group(__DIR__ . '/../routes/inertia.php');
 
         Route::middleware(['nova', Authorize::class])
-            ->prefix('nova-vendor/report')
+            ->prefix('nova-vendor/jshxl-report')
             ->namespace('Jshxl\Report\Http\Controllers')
-            ->group(__DIR__.'/../routes/api.php');
+            ->group(__DIR__ . '/../routes/api.php');
     }
 
     /**
@@ -87,7 +92,7 @@ class ToolServiceProvider extends ServiceProvider
     protected function registerPublishing(): void
     {
         $this->publishes([
-            __DIR__ . '/../resources/lang' => lang_path('vendor/report'),
+            __DIR__ . '/../lang' => lang_path('jshxl/report'),
         ], 'jshxl-report-lang');
 
         $this->publishes([
