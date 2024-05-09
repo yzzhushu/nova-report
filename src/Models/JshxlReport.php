@@ -4,7 +4,6 @@ namespace Jshxl\Report\Models;
 
 use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Casts\Attribute;
 
 class JshxlReport extends Model
 {
@@ -25,19 +24,6 @@ class JshxlReport extends Model
         'sort_no' => 'integer',
         'users'   => 'array',
     ];
-
-    /**
-     * 报表字段对照
-     *
-     * @return Attribute
-     * */
-    protected function fields(): Attribute
-    {
-        return Attribute::make(
-            get: fn($value) => json_decode($value, true),
-            set: fn($value) => !is_array($value) || count($value) === 0 ? '{}' : json_encode($value)
-        );
-    }
 
     /**
      * Bootstrap the model and its traits.
