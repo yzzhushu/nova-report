@@ -20,9 +20,9 @@ class JshxlReport extends Model
      * @var array
      */
     protected $casts = [
-        'status'  => 'integer',
-        'sort_no' => 'integer',
-        'users'   => 'array',
+        'status'       => 'integer',
+        'display_sort' => 'integer',
+        'auth_users'   => 'array',
     ];
 
     /**
