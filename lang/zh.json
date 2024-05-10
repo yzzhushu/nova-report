@@ -13,7 +13,7 @@
     "Auth Users": "授权用户",
     "Report Status: 0, Disable; 1, Enable": "报表启用状态：0，停用；1，启用。默认停用",
     "Report Status": "启用状态",
-    "Who can view this report, default all users.": "谁可以查看这张报表，默认所有用户",
+    "Who can view this report? no one can view by default.": "可以查看这张报表的人，默认没人可以查看",
     "Report Users": " 位用户",
     "Created At": "创建时间",
     "Updated At": "更新时间"

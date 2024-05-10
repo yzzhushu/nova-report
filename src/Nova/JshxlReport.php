@@ -96,7 +96,7 @@ class JshxlReport extends Resource
                     return count($users) . ' ' . __('Report Users');
                 })
                 ->textAlign('center')
-                ->help(__('Who can view this report, default all users.'))
+                ->help(__('Who can view this report? no one can view by default.'))
                 ->formatInt(),
             Boolean::make(__('Report Status'), 'status')
                 ->help(__('Report Status: 0, Disable; 1, Enable'))
