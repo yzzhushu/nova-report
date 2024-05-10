@@ -1,5 +1,5 @@
-import Tool from './pages/Tool'
+import Tool from './pages/Tool';
 
 Nova.booting((app, store) => {
-  Nova.inertia('Report', Tool)
+    Nova.inertia('Report', Tool);
 })

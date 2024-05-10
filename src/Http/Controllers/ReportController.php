@@ -23,11 +23,11 @@ class ReportController
     {
         $report = JshxlReport::query()
             ->where('uuid', $reportId)
-            ->select('status', 'data_ease')
+            ->select('status', 'data_ease', 'report_name')
             ->first();
         if (is_null($report)) abort(404);
         if ($report->status !== 1) abort(403);
-        return inertia('Report', ['data_ease' => $report->data_ease]);
+        return inertia('Report', ['data_ease' => $report->data_ease, 'report_name' => $report->report_name]);
     }
 
     /**

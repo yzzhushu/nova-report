@@ -41,7 +41,8 @@ class ReportMenu
                 $group = [];
                 $_name = $report->group_name;
             }
-            $group[] = MenuItem::link($report->report_name, 'jshxl-report/' . $report->uuid);
+            $route = config('jshxl_report.report_route_prefix', '/jshxl-report') . '/' . $report->uuid;
+            $group[] = MenuItem::link($report->report_name, $route);
         }
         if (count($group) > 0) $lists[] = MenuGroup::make($_name, $group)->collapsable();
 
