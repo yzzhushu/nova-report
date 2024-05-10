@@ -62,7 +62,7 @@ class ToolServiceProvider extends ServiceProvider
         }
 
         Route::middleware(['nova', Authenticate::class, Authorize::class])
-            ->prefix('jshxl-report')
+            ->prefix(config('nova.path') . '/jshxl-report')
             ->namespace('Jshxl\Report\Http\Controllers')
             ->group(__DIR__ . '/../routes/inertia.php');
 

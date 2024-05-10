@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Inertia\Response;
 use Inertia\ResponseFactory;
+use Jshxl\Report\Models\JshxlReport;
 
 class ReportController
 {
@@ -20,7 +21,13 @@ class ReportController
      */
     public function inertia(Request $request, string $reportId): \Inertia\Response|\Inertia\ResponseFactory
     {
-        return inertia('Report', ['reportId' => $reportId]);
+        $report = JshxlReport::query()
+            ->where('uuid', $reportId)
+            ->select('status', 'data_ease')
+            ->first();
+        if (is_null($report)) abort(404);
+        if ($report->status !== 1) abort(403);
+        return inertia('Report', ['data_ease' => $report->data_ease]);
     }
 
     /**
