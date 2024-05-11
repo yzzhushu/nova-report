@@ -5,7 +5,6 @@ namespace Jshxl\Report;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 use Jshxl\Report\Nova\JshxlReport;
-use Laravel\Nova\Events\ServingNova;
 use Laravel\Nova\Http\Middleware\Authenticate;
 use Laravel\Nova\Nova;
 use Jshxl\Report\Http\Middleware\Authorize;
@@ -44,10 +43,6 @@ class ToolServiceProvider extends ServiceProvider
                 config_path('jshxl_report.php') :
                 __DIR__ . '/../config/jshxl_report.php',
         'jshxl_report');
-
-        Nova::serving(function (ServingNova $event) {
-            //
-        });
     }
 
     /**

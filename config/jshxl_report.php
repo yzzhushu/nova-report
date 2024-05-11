@@ -10,4 +10,10 @@ return [
 
     // 报表路由前缀
     'report_route_prefix' => '/jshxl-report',
+
+    // DataEase App ID
+    'data_ease_id' => '',
+
+    // DataEase Secret
+    'data_ease_secret' => '',
 ];

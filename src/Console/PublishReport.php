@@ -29,10 +29,10 @@ class PublishReport extends Command
      */
     public function handle(): void
     {
-        $this->call('vendor:publish', [
-            '--tag'   => 'jshxl-report-lang',
-            '--force' => $this->option('force'),
-        ]);
+//        $this->call('vendor:publish', [
+//            '--tag'   => 'jshxl-report-lang',
+//            '--force' => $this->option('force'),
+//        ]);
 
         $this->call('vendor:publish', [
             '--tag'   => 'jshxl-report-config',
