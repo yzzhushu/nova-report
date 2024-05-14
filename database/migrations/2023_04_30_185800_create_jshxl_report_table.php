@@ -19,7 +19,8 @@ return new class extends Migration
             $table->string('report_name', 64);                              // 报表名称
             $table->integer('display_sort')->default(1);                    // 报表排序
 
-            $table->string('dv_id', 128)->nullable();                       // 仪表板/数据大屏ID
+            $table->string('de_type', 64)->default('dashboard');            // DataEase报表类型
+            $table->string('de_id', 128)->nullable();                       // 仪表板/数据大屏ID
             $table->string('chart_id', 128)->nullable();                    // 视图ID
 
             $table->text('auth_users')->default('[]');                      // 授权用户

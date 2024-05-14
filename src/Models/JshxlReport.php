@@ -23,8 +23,6 @@ class JshxlReport extends Model
         'status'       => 'integer',
         'display_sort' => 'integer',
         'auth_users'   => 'array',
-        'chart_id'     => 'string',
-        'dv_id'        => 'string',
     ];
 
     /**

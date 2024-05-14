@@ -16,4 +16,7 @@ return [
 
     // DataEase Secret
     'data_ease_secret' => '',
+
+    // DataEase 服务域名
+    'data_ease_domain' => '',
 ];

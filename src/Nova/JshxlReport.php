@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
 use Laravel\Nova\Fields\Boolean;
 use Laravel\Nova\Fields\DateTime;
+use Laravel\Nova\Fields\Select;
 use Laravel\Nova\Fields\Stack;
 use Laravel\Nova\Fields\Text;
 use Laravel\Nova\Http\Requests\NovaRequest;
@@ -85,11 +86,21 @@ class JshxlReport extends Resource
                 ->help(__('Report Display Sort Number, default 10000, the larger the number, the higher the display position.'))
                 ->rules('required', 'integer', 'min:1', 'max:99999'),
 
+            Select::make(__('DataEase Type'), 'de_type')
+                ->displayUsingLabels()
+                ->options([
+                    'dashboard' => '仪表板',
+                    'dataV'     => '数据大屏',
+                ])
+                ->textAlign('center')
+                ->help(__('The type of DataEase report.'))
+                ->rules('required', 'string', 'in:dashboard,dataV')
+                ->default('dashboard'),
             Stack::make(__('DataEase'), [
-                Text::make(__('DataEase DV'), 'dv_id')->textAlign('center'),
+                Text::make(__('DataEase ID'), 'de_id')->textAlign('center'),
                 Text::make(__('DataEase Chart'), 'chart_id')->textAlign('center'),
             ])->onlyOnIndex()->textAlign('center'),
-            Text::make(__('DataEase DV'), 'dv_id')
+            Text::make(__('DataEase ID'), 'de_id')
                 ->hideFromIndex()
                 ->rules('required', 'string', 'regex:/^[0-9]{1,128}$/')
                 ->help(__('DataEase DV or DBS element id.')),

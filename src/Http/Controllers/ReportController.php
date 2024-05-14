@@ -25,15 +25,16 @@ class ReportController
         $report = JshxlReport::query()
             ->where('uuid', $reportId)
             ->whereJsonContains('auth_users', $request->user()->id)
-            ->select('status', 'dv_id', 'chart_id', 'report_name')
+            ->select('status', 'de_type', 'de_id', 'chart_id', 'report_name')
             ->first();
         if (is_null($report) || $report->status !== 1) abort(403);
         return inertia('Report', [
             'token'    => $_token,
             'report'   => $report->report_name,
-            'dvId'     => $report->dv_id,
-            'chartId'  => $report->chart_id,
-            'DEDomain' => 'https://de.jshxl.cn:2001',
+            'deType'   => $report->de_type,
+            'deId'     => $report->de_id,
+            'chartId'  => strval($report->chart_id),
+            'DEDomain' => config('jshxl_report.data_ease_domain'),
         ]);
     }
 
@@ -45,14 +46,13 @@ class ReportController
      * */
     public function getUsers(Request $request): JsonResponse
     {
-        $department = DB::table('user_departments')
+        $shops = DB::table('user_departments')
             ->leftJoin('departments', 'departments.department_id', '=', 'user_departments.department_id')
             ->selectRaw('STRING_AGG(departments.department_name, \',\') AS departments')
             ->addSelect('user_departments.user_id')
             ->groupBy('user_departments.user_id');
-
         $users = User::query()
-            ->leftJoin(DB::raw('(' . $department->toSql() . ') AS d'), 'd.user_id', '=', 'users.id')
+            ->leftJoin(DB::raw('(' . $shops->toSql() . ') AS d'), 'd.user_id', '=', 'users.id')
             ->where('status', 1)
             ->selectRaw('users.id, users.name + \'—\' + d.departments AS name')
             ->orderBy('d.departments')
@@ -74,8 +74,8 @@ class ReportController
     {
         $_appid = config('jshxl_report.data_ease_id');
         $secret = config('jshxl_report.data_ease_secret');
-        if (!is_string($_appid) || !is_string($secret))
-            abort(500, 'DataEase App ID or Secret not set!');
+        if (empty($_appid) || empty($secret))
+            abort(412, 'DataEase App ID or Secret not set! Publish the config file and set the values!');
 
         $h = $this->base64url(json_encode([
             'typ' => 'JWT',
@@ -85,7 +85,8 @@ class ReportController
             'appId'   => $_appid,
             'account' => 'admin',
         ]));
-        return $h . '.' . $p . '.' . $this->base64url(hash_hmac('sha256', $h . '.' . $p, $secret, true));
+        $s = $h . '.' . $p;
+        return $s . '.' . $this->base64url(hash_hmac('sha256', $s, $secret, true));
     }
 
     /**
